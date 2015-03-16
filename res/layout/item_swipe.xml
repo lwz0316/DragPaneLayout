@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.lwz.dragpanelayout.view.DragPaneLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drag_pane_layout"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:background="#fff"
+    android:descendantFocusability="blocksDescendants" >
+
+    <TextView
+        android:id="@+id/botton"
+        android:layout_width="100dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="right"
+        android:background="#ff0000"
+        android:gravity="center"
+        android:text="Bottom" />
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#0099cc"
+        android:gravity="center"
+        android:text="item"
+        android:textColor="#FFF" />
+
+</com.lwz.dragpanelayout.view.DragPaneLayout>
