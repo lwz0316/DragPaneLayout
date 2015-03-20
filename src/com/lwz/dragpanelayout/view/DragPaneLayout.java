@@ -331,7 +331,7 @@ public class DragPaneLayout extends FrameLayout {
     
     private void onPaneDragged(int newLeft) {
     	mDragOffset = (float) (newLeft) / mDragRange;
-        mPaneStateChangedProxy.onPaneDragged(Mode.BOTH, mDragOffset);
+        mPaneStateChangedProxy.onPaneDragged(mMode, mDragOffset);
     }
     
     /**
@@ -430,7 +430,7 @@ public class DragPaneLayout extends FrameLayout {
 		public int clampViewPositionHorizontal(View child, int left, int dx) {
 			int newLeft = mDragLeft + left;
             int startBound = 0;
-            int endBound = startBound + mDragRange;
+            int endBound = startBound + getViewHorizontalDragRange(child);
             if( Mode.RIGHT == mMode ) {
             	newLeft = Math.max(Math.min(newLeft, -startBound), -endBound);
             } else if( Mode.LEFT == mMode ){
@@ -443,7 +443,7 @@ public class DragPaneLayout extends FrameLayout {
 		
 		@Override
 		public int getViewHorizontalDragRange(View child) {
-			return mDragRange;
+				return mDragRange;
 		}
 		
 		@Override
