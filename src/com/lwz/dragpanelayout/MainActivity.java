@@ -14,8 +14,8 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
 import android.widget.SimpleAdapter.ViewBinder;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lwz.dragpanelayout.view.DragPaneLayout;
@@ -32,6 +32,7 @@ public class MainActivity extends ListActivity {
 		
 		setContentView(R.layout.activity_main);
 		mDragPaneLayout = (TransformationDragPaneLayout) findViewById(R.id.drag_pane_layout);
+		mDragPaneLayout.setDragRange(500);
 		mDragPaneLayout.setDragPane(android.R.id.list);
 		mDragPaneLayout.setSecondaryView(R.id.bottom_view);
 		List<Map<String, String>> data = new ArrayList<Map<String, String>>();
@@ -47,7 +48,7 @@ public class MainActivity extends ListActivity {
 			@Override
 			public boolean setViewValue(View view, Object data, String textRepresentation) {
 				final DragPaneLayout paneLayout = ((DragPaneLayout)view);
-				paneLayout.setDragRangeOffset(0.4f);
+				paneLayout.setDragRange(200);
 				paneLayout.setMode(Mode.BOTH);
 				TextView text;
 				(text = (TextView)paneLayout.findViewById(R.id.text)).setText(textRepresentation);
@@ -109,11 +110,11 @@ public class MainActivity extends ListActivity {
 	}
 	
 	public void onOffsetChange(View view) {
-		float currentOffset = mDragPaneLayout.getDragRangeOffset();
-		if( currentOffset == 0.8f ) {
-			mDragPaneLayout.setDragRangeOffset(0.6f);
+		int range = mDragPaneLayout.getDragRange();
+		if( range == 500 ) {
+			mDragPaneLayout.setDragRange(800);
 		} else {
-			mDragPaneLayout.setDragRangeOffset(0.8f);
+			mDragPaneLayout.setDragRange(500);
 		}
 	}
 }
