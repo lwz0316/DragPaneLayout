@@ -86,7 +86,6 @@ public class DragPaneLayout extends FrameLayout {
 	}
 	
 	private static final float TOUCH_SLOP_SENSITIVITY = 0.5f;
-	private static final float DEFALUT_PANE_DRAG_RANGE_OFFSET = 0.7f;
 	
 	/**
 	 * 不允许父视图阻断触摸事件的最大Y轴偏移量，超过了这个偏移量就允许父视图阻止触摸事件。
@@ -103,7 +102,6 @@ public class DragPaneLayout extends FrameLayout {
 	private ViewDragCallback mViewDragCallback;
 	private View mDragPane;
 	private Mode mMode = Mode.RIGHT;
-	private float mDragRangeOffset = DEFALUT_PANE_DRAG_RANGE_OFFSET;
 	private int mDragRange;
 	private int mDragLeft;
 	private float mDragOffset;
@@ -168,7 +166,7 @@ public class DragPaneLayout extends FrameLayout {
 		ViewCompat.setImportantForAccessibility(this,
                 ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO);
 		
-		// So that we can catch the back button
+		// So that we can catch the back button ?
         setFocusableInTouchMode(true);
         setClickable(true);
         ViewGroupCompat.setMotionEventSplittingEnabled(this, false);
@@ -206,33 +204,10 @@ public class DragPaneLayout extends FrameLayout {
 		mFirstLayout = true;
 	}
 	
-	/**
-	 * 设置 PaneView 最大的拖动距离比例, 范围为 [0, 1]
-	 * @param offset [0, 1] 侧滑距离 = offset * PaneView.width();
-	 */
-	public void setDragRangeOffset(float offset) {
-		if( mDragRangeOffset != offset ) {
-			closePane();
-			mDragRangeOffset = offset;
-			mDragRange = 0; // 在 onLayout() 中会重新计算 drag range
-			requestLayout();
-		}
-	}
-	
-	/**
-	 * 获取当前 PaneView 拖动距离的比例 offset = paneView.getWidth() / dragRange
-	 * @return offset [0, 1]
-	 */
-	public float getDragRangeOffset() {
-		return mDragRangeOffset;
-	}
-	
 	@Override
 	protected void onLayout(boolean changed, int left, int top, int right,
 			int bottom) {
 		super.onLayout(changed, left, top, right, bottom);
-		mDragRange = (int)((right - left) * mDragRangeOffset);
-		
 		if( mFirstLayout ) {
 			if( mPreservedOpenState ) {
 				openPane();
@@ -310,6 +285,25 @@ public class DragPaneLayout extends FrameLayout {
 		if( mDragPane != view ) {
 			mDragPane = view;
 		}
+	}
+	
+	/**
+	 * 设置 PaneView 最大拖动范围
+	 * @param dragRange
+	 */
+	public void setDragRange(int dragRange ) {
+		if( mDragRange != dragRange ) {
+			closePane();
+			mDragRange = dragRange;
+		}
+	}
+	
+	/**
+	 * 获取当前 PaneView 拖动范围
+	 * @return dragRange
+	 */
+	public int getDragRange() {
+		return mDragRange;
 	}
 	
 	@Override
@@ -518,8 +512,8 @@ public class DragPaneLayout extends FrameLayout {
         ss.isOpen = isOpened();
         ss.isDragOpenable = isDragOpenable();
         ss.mode = mMode;
-        ss.bothModeDragOffsetState = (int)mDragOffset;
-        ss.dragRangeOffset = mDragRangeOffset;
+        ss.bothModeDragOffsetState = (int) mDragOffset;
+        ss.dragRange = mDragRange;
         return ss;
     }
 	
@@ -531,7 +525,7 @@ public class DragPaneLayout extends FrameLayout {
         setDragOpenable(ss.isDragOpenable);
         mPreservedOpenState = ss.isOpen;
         mBothModeSildeOffsetState = ss.bothModeDragOffsetState;
-        mDragRangeOffset = ss.dragRangeOffset;
+        mDragRange = ss.dragRange;
         if (ss.isOpen) {
             openPane();
         } else {
@@ -544,7 +538,7 @@ public class DragPaneLayout extends FrameLayout {
         boolean isDragOpenable;
         Mode mode;
         int bothModeDragOffsetState; // for Mode.BOTH only. left open OR right open OR close
-        float dragRangeOffset;
+        int dragRange;
         
         SavedState(Parcelable superState) {
             super(superState);
@@ -556,7 +550,7 @@ public class DragPaneLayout extends FrameLayout {
             isDragOpenable = in.readInt() != 0;
             mode = Mode.valueOf(in.readString());
             bothModeDragOffsetState = in.readInt();
-            dragRangeOffset = in.readFloat();
+            dragRange = in.readInt();
         }
 
         @Override
@@ -566,7 +560,7 @@ public class DragPaneLayout extends FrameLayout {
             out.writeInt(isDragOpenable ? 1 : 0);
             out.writeString(mode.toString());
             out.writeInt(bothModeDragOffsetState);
-            out.writeFloat(dragRangeOffset);
+            out.writeInt(dragRange);
         }
 
         public static final Parcelable.Creator<SavedState> CREATOR =
