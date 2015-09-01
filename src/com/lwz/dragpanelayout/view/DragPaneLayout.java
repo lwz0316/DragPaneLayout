@@ -103,7 +103,6 @@ public class DragPaneLayout extends FrameLayout {
 	private View mDragPane;
 	private Mode mMode = Mode.RIGHT;
 	private int mDragRange;
-	private int mDragLeft;
 	private float mDragOffset;
 	final float mDensity;
 	/** 拖动是否可以开启 */
@@ -118,6 +117,8 @@ public class DragPaneLayout extends FrameLayout {
     private boolean mPreservedOpenState;
     private int mBothModeSildeOffsetState;
     private boolean mFirstLayout = true;
+    private int mLeftOffset;
+	private int mTopOffset;
     
     private GestureDetectorCompat mGestureDetector;
     
@@ -214,6 +215,10 @@ public class DragPaneLayout extends FrameLayout {
 			} else {
 				closePane();
 			}
+		} else {
+			// 保持当前位置不变，修复由于子View调用requestLayout()导致的bug 
+			mDragPane.offsetLeftAndRight(mLeftOffset);
+			mDragPane.offsetTopAndBottom(mTopOffset);
 		}
 		mFirstLayout = false;
 	}
@@ -240,7 +245,8 @@ public class DragPaneLayout extends FrameLayout {
 		return mDragHelper.shouldInterceptTouchEvent(ev) 
 				|| shouldInterceptDragPaneTouchEvent(ev); 
 	}
-	/*
+	
+	/**
 	 * 拦截 PaneView 的Touch 事件
 	 * 非关闭状态，并且当前手指触摸在 PaneView 上, 则拦截Touch 事件
 	 * @param ev 触摸事件
@@ -310,6 +316,10 @@ public class DragPaneLayout extends FrameLayout {
 	public void computeScroll() {
 		if( mDragHelper.continueSettling(true) ) {
 			ViewCompat.postInvalidateOnAnimation(this);
+		} else {
+			// 记录当前位移状态，保证调用 onLayout() 方法时保持当前位置不动
+			mLeftOffset = mDragPane.getLeft();
+			mTopOffset = mDragPane.getTop();
 		}
 	}
 	
@@ -428,7 +438,7 @@ public class DragPaneLayout extends FrameLayout {
 
 		@Override
 		public int clampViewPositionHorizontal(View child, int left, int dx) {
-			int newLeft = mDragLeft + left;
+			int newLeft = left;
             int startBound = 0;
             int endBound = startBound + getViewHorizontalDragRange(child);
             if( Mode.RIGHT == mMode ) {
